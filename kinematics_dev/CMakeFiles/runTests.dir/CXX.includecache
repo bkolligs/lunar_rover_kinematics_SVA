@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/kinematics_tests.cpp
+SkewTest.h
+/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/SkewTest.h
+OmegaTest.h
+/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/OmegaTest.h
+gtest/gtest.h
+-
+iostream
+-
+
+include/kinematics.h
+eigen3/Eigen/Dense
+-
+math.h
+-
+
+test/include_tests/OmegaTest.h
+kinematics.h
+test/include_tests/kinematics.h
+gtest/gtest.h
+-
+
+test/include_tests/SkewTest.h
+gtest/gtest.h
+-
+kinematics.h
+test/include_tests/kinematics.h
+

@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/build",
+  "command": "/usr/bin/g++-7   -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/include -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/include_tests  -g   -o CMakeFiles/kinematics.dir/src/kinematics.cpp.o -c /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/kinematics.cpp",
+  "file": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/kinematics.cpp"
+},
+{
+  "directory": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/build",
+  "command": "/usr/bin/g++-7   -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/include -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/include_tests  -g   -o CMakeFiles/kinematics.dir/src/classTest.cpp.o -c /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/classTest.cpp",
+  "file": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/classTest.cpp"
+},
+{
+  "directory": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/build",
+  "command": "/usr/bin/g++-7   -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/include -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/include_tests  -g   -o CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o -c /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/kinematics_tests.cpp",
+  "file": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/kinematics_tests.cpp"
+},
+{
+  "directory": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/build",
+  "command": "/usr/bin/g++-7   -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/include -I/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/include_tests  -g   -o CMakeFiles/rover_kinematics.dir/src/main.cpp.o -c /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/main.cpp",
+  "file": "/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/src/main.cpp"
+}
+]

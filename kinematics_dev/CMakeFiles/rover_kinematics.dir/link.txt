@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/rover_kinematics.dir/src/main.cpp.o  -o rover_kinematics -Wl,-Bstatic -lgtest -Wl,-Bdynamic -lpthread libkinematics.a 
