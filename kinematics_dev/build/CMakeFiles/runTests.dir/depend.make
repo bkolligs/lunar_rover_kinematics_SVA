@@ -5,5 +5,6 @@ CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../include/kinematics.h
 CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../test/include_tests/HomogTest.h
 CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../test/include_tests/OmegaTest.h
 CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../test/include_tests/SkewTest.h
+CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../test/include_tests/TransformTest.h
 CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o: ../test/kinematics_tests.cpp
 

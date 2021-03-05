@@ -2,6 +2,7 @@
 #include "SkewTest.h"
 #include "OmegaTest.h"
 #include "HomogTest.h"
+#include "TransformTest.h"
 // general headers
 #include <gtest/gtest.h>
 #include <iostream>
@@ -190,6 +191,18 @@ TEST_F(HomogTest, FullEulerAngles){
 
     ASSERT_TRUE(m.isApprox(compare, 0.001));
 
+}
+
+// *******************************************************************************************************
+// Kinematics::updateTransforms tests
+TEST_F(TransformTest, TransformListTest){
+    m = testRover.getTransforms()[0];
+    compare << -1.0000,   -0.0000,         0,    1.9951,
+                0.0000,   -1.0000,         0,   -3.0029,
+                     0,         0,    1.0000,    0.1700,
+                     0,         0,         0,    1.0000;
+
+    ASSERT_TRUE(m.isApprox(compare, 1));
 }
  
 int main(int argc, char **argv) {

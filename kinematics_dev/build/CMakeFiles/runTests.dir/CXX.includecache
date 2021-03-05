@@ -9,6 +9,10 @@
 ../include/kinematics.h
 eigen3/Eigen/Dense
 -
+iostream
+-
+array
+-
 math.h
 -
 
@@ -30,6 +34,12 @@ gtest/gtest.h
 kinematics.h
 ../test/include_tests/kinematics.h
 
+../test/include_tests/TransformTest.h
+kinematics.h
+../test/include_tests/kinematics.h
+gtest/gtest.h
+-
+
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/kinematics_tests.cpp
 SkewTest.h
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/SkewTest.h
@@ -37,6 +47,8 @@ OmegaTest.h
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/OmegaTest.h
 HomogTest.h
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/HomogTest.h
+TransformTest.h
+/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/TransformTest.h
 gtest/gtest.h
 -
 iostream

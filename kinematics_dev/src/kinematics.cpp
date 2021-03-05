@@ -1,34 +1,72 @@
 #include "kinematics.h"
 
 // class constructor
-Kinematics::Kinematics(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1> &q_initial) 
+Kinematics::Kinematics(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1> q_initial) 
     : w_{w}, l_{l}, h_{h}, r_{r}, q_{q_initial}
     {
+        // rows i is wheel i
+        configurationTable <<  l_,  w_, -h_,
+                               l_, -w_, -h_,
+                              -l_,  w_, -h_,
+                              -l_, -w_, -h_;
+
+         // initialize transform list
+        updateTransforms();
 
     }
 
 
 // update the transforms
-void updateTransforms(){
+//TODO: Fix this list function
+void Kinematics::updateTransforms(){
+    Eigen::Matrix4d transWorld_Base;
+    Eigen::Matrix4d transWorld_Joint;
+    Eigen::Matrix4d transBase_Joint;
+    Eigen::Matrix4d transWorld_Contact;
+    Eigen::Matrix4d transBase_JointPrime;
+    Eigen::Matrix4d transJoint_Contact;
+    Eigen::Vector4d curJointValues;
 
+
+    curWorldOri = q_(Eigen::seq(0, 2));
+    curWorldPos = q_(Eigen::seq(3, 5));
+    curJointValues = q_(Eigen::seq(6, 9));
+
+    transWorld_Base = homogenousTransform(curWorldOri, curWorldPos);
+    transformList[0] = transWorld_Base;
+
+    // update the joint angle transforms and contact frame transforms
+    for (int i = 1; i <= nWheels_;i++){
+        // joint transform
+        transBase_Joint = homogenousTransform({0, curJointValues(i-1), 0}, configurationTable.block(i-1, 0, 1, 3).transpose());
+        transWorld_Joint = transWorld_Base * transBase_Joint;
+        transformList[i] = transWorld_Joint;
+
+        // contact transform for each wheel
+        transBase_JointPrime = transBase_Joint;
+        transBase_JointPrime.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity(3, 3);
+        transJoint_Contact = homogenousTransform({0, 0, 0}, {0, 0, -r_});
+        transWorld_Contact = transWorld_Base * transBase_JointPrime * transJoint_Contact;
+
+        transformList[i + nWheels_] = transWorld_Contact;
+    }
 }
 
 // calculate the jacobian
-void jacobian(){
+void Kinematics::jacobian(){
 
 }
 
 // navigation kinematics
-void navigation(){
+void Kinematics::navigation(){
 
 }
 
 // actuation kinematics
-void actuation(){
+void Kinematics::actuation(){
 
 }
 
-// theta is joint angle, pos is translation from parent frame
 Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos){
     Eigen::Matrix4d homogTransform = Eigen::Matrix4d::Zero();
     Eigen::Matrix3d rotationX;
@@ -60,14 +98,19 @@ Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, cons
 
 
 // calculate V(q)
-Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian(const Eigen::Matrix<double, 10, 1> &q)
+Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian()
 {
     Eigen::Matrix<double, 10, 10> vOutput = Eigen::Matrix<double, 10, 10>::Zero();
+    Eigen::Matrix4d transWorld_Base = transformList[0];
+    Eigen::Matrix3d rotWorld_Base = transWorld_Base.block(0, 0, 3, 3);
     Eigen::Matrix4d eyeFour = Eigen::Matrix4d::Identity(4, 4);
     Eigen::Matrix3d omega;
 
     omega(q_(Eigen::seq(0,3)), omega);
 
+    vOutput.block(0, 0, 3, 3) << omega;
+    vOutput.block(3, 3, 3, 3) << rotWorld_Base;
+    vOutput.block(6, 6, 4, 4) << eyeFour;
 
     return vOutput;
 
@@ -101,4 +144,12 @@ void Kinematics::skew(const Eigen::Vector3d &v, Eigen::Matrix3d & skewSym)
     skewSym <<   0, -v(2),  v(1),
               v(2),     0, -v(0),
              -v(1),  v(0),     0;
+}
+
+Eigen::Matrix<double, 10, 1> & Kinematics::getState(){
+    return q_;
+}
+
+std::array<Eigen::Matrix4d, 9> Kinematics::getTransforms(){
+    return transformList;
 }

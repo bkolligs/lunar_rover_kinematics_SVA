@@ -11,6 +11,10 @@
 ../include/kinematics.h
 eigen3/Eigen/Dense
 -
+iostream
+-
+array
+-
 math.h
 -
 

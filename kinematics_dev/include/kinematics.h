@@ -1,5 +1,7 @@
 #pragma once
 #include <eigen3/Eigen/Dense>
+#include <iostream>
+#include <array>
 #include <math.h>
 
 class Kinematics
@@ -15,20 +17,25 @@ class Kinematics
         const double r_=0.05;
         // number of wheels will always be 4
         const int nWheels_ = 4;
+        // rover translation table
+        Eigen::Matrix<double, 4, 3> configurationTable;
 
         // current vehicle state
-        Eigen::Matrix<double, 10, 1> & q_;
+        Eigen::Matrix<double, 10, 1> q_;
+        // current pose orientation from world frame, position in cartesian
+        Eigen::Vector3d curWorldOri;
+        Eigen::Vector3d curWorldPos;
         // current vehicle velocity
         Eigen::Matrix<double, 10, 1> q_dot_;
         // wheel contact point constraints
         Eigen::Matrix<double, 12, 1> contactConstraints_ = Eigen::Matrix<double, 12, 1>::Zero();
         // jacobian matrix
         Eigen::Matrix<double, 12, 10> jacobianMatrix_;
-        // list of transformation matrices
-        Eigen::Matrix4d * transformList;
+        // array of transformation matrices
+        std::array<Eigen::Matrix4d, 9> transformList;
 
     public:
-        Kinematics(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1> &q_initial);
+        Kinematics(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1> q_initial);
         // Kinematics(double w, double l, double h, double r);
 
         // update the transforms
@@ -43,18 +50,20 @@ class Kinematics
         // actuation kinematics
         void actuation();
 
-        // theta is joint angle, pos is translation from parent frame
         Eigen::Matrix4d homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos);
 
         // calculate V(q)
-        Eigen::Matrix<double, 10, 10> spatialToCartesian(const Eigen::Matrix<double, 10, 1> &q);
+        Eigen::Matrix<double, 10, 10> spatialToCartesian();
 
-        // calculate omega
+        // for use in V(q)
         void omega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega);
 
-        // skew symmetric matrix froma vector
+        // included with class so there are less external dependencies
         void skew(const Eigen::Vector3d &v, Eigen::Matrix3d &skewSym);
 
+        Eigen::Matrix<double, 10, 1> & getState();
+
+        std::array<Eigen::Matrix4d, 9> getTransforms();
 };
 
 
