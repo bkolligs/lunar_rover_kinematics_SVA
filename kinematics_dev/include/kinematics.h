@@ -21,31 +21,33 @@ class Kinematics
         // current vehicle velocity
         Eigen::Matrix<double, 10, 1> q_dot_;
         // wheel contact point constraints
-        Eigen::Matrix<double, 12, 1> vc_ = Eigen::Matrix<double, 12, 1>::Zero();
+        Eigen::Matrix<double, 12, 1> contactConstraints_ = Eigen::Matrix<double, 12, 1>::Zero();
+        // jacobian matrix
+        Eigen::Matrix<double, 12, 10> jacobianMatrix_;
         // list of transformation matrices
-        Eigen::Matrix4d * tList;
+        Eigen::Matrix4d * transformList;
 
     public:
         Kinematics(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1> &q_initial);
         // Kinematics(double w, double l, double h, double r);
 
         // update the transforms
-        Eigen::Matrix4d * updateTransforms(Eigen::Matrix<double, 10, 1>  q);
+        void updateTransforms();
 
         // calculate the jacobian
-        Eigen::Matrix<double, 12, 10> jacobian();
+        void jacobian();
 
         // navigation kinematics
-        Eigen::Matrix<double, 10, 1> navigation();
+        void navigation();
 
         // actuation kinematics
-        Eigen::Matrix<double, 10, 1> actuation();
+        void actuation();
 
         // theta is joint angle, pos is translation from parent frame
         Eigen::Matrix4d homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos);
 
         // calculate V(q)
-        Eigen::Matrix<double, 10, 10> spatialToCartesian(Eigen::Matrix<double, 10, 1> q);
+        Eigen::Matrix<double, 10, 10> spatialToCartesian(const Eigen::Matrix<double, 10, 1> &q);
 
         // calculate omega
         void omega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega);

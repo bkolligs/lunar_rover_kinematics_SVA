@@ -9,26 +9,22 @@ Kinematics::Kinematics(double w, double l, double h, double r, Eigen::Matrix<dou
 
 
 // update the transforms
-Eigen::Matrix4d * Kinematics::updateTransforms(Eigen::Matrix<double, 10, 1>  q)
-{
+void updateTransforms(){
 
 }
 
 // calculate the jacobian
-Eigen::Matrix<double, 12, 10> Kinematics::jacobian()
-{
+void jacobian(){
 
 }
 
 // navigation kinematics
-Eigen::Matrix<double, 10, 1> Kinematics::navigation()
-{
+void navigation(){
 
 }
 
 // actuation kinematics
-Eigen::Matrix<double, 10, 1> Kinematics::actuation()
-{
+void actuation(){
 
 }
 
@@ -64,8 +60,16 @@ Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, cons
 
 
 // calculate V(q)
-Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian(Eigen::Matrix<double, 10, 1> q)
+Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian(const Eigen::Matrix<double, 10, 1> &q)
 {
+    Eigen::Matrix<double, 10, 10> vOutput = Eigen::Matrix<double, 10, 10>::Zero();
+    Eigen::Matrix4d eyeFour = Eigen::Matrix4d::Identity(4, 4);
+    Eigen::Matrix3d omega;
+
+    omega(q_(Eigen::seq(0,3)), omega);
+
+
+    return vOutput;
 
 }
 
