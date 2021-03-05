@@ -16,8 +16,7 @@ Kinematics::Kinematics(double w, double l, double h, double r, Eigen::Matrix<dou
     }
 
 
-// update the transforms
-//TODO: Fix this list function
+// update the transforms based off of current state
 void Kinematics::updateTransforms(){
     Eigen::Matrix4d transWorld_Base;
     Eigen::Matrix4d transWorld_Joint;
@@ -26,7 +25,6 @@ void Kinematics::updateTransforms(){
     Eigen::Matrix4d transBase_JointPrime;
     Eigen::Matrix4d transJoint_Contact;
     Eigen::Vector4d curJointValues;
-
 
     curWorldOri = q_(Eigen::seq(0, 2));
     curWorldPos = q_(Eigen::seq(3, 5));
@@ -88,7 +86,7 @@ Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, cons
                  sin(gamma),  cos(gamma), 0, 
                           0,           0, 1;
 
-    // populate rotation of HT
+    // populate rotation of HT, and force bottom right to be 1.0
     homogTransform(3, 3) = 1.0;
     homogTransform.block(0,0,3,3) << rotationZ * rotationY * rotationX;
     homogTransform.block(0, 3, 3, 1) << pos;
@@ -108,6 +106,7 @@ Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian()
 
     calculateOmega(q_(Eigen::seq(0, 2)), omega);
 
+    // populate V(q) with these matrices
     vOutput.block(0, 0, 3, 3) << omega;
     vOutput.block(3, 3, 3, 3) << rotWorld_Base;
     vOutput.block(6, 6, 4, 4) << eyeFour;

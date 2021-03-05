@@ -110,7 +110,8 @@ classdef kinematicMR < handle
                      0           0       1 0;
                      0           0       0 1];
             euler = Rz*Ry*Rx;
-            t_w2b = euler * t_w2b;
+            t_w2b = t_w2b * euler;
+
             
             joints = obj.q_(6:10);
             

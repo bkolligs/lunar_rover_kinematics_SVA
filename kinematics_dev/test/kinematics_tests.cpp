@@ -196,13 +196,32 @@ TEST_F(HomogTest, FullEulerAngles){
 // *******************************************************************************************************
 // Kinematics::updateTransforms tests
 TEST_F(TransformTest, TransformListTest){
+    // test world to body transform
     m = testRover.getTransforms()[0];
-    compare << -1.0000,   -0.0000,         0,    1.9951,
-                0.0000,   -1.0000,         0,   -3.0029,
-                     0,         0,    1.0000,    0.1700,
-                     0,         0,         0,    1.0000;
+    compare << -1.0000,   -0.0000,        0,   -1.9951,
+                0.0000,   -1.0000,        0,    3.0029,
+                    0,         0,    1.0000,    0.1700,
+                    0,         0,         0,    1.0000;
 
-    ASSERT_TRUE(m.isApprox(compare, 1));
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+
+    // test a joint location transform
+    m = testRover.getTransforms()[1];
+    compare <<   1.0000,   -0.0000,   -0.0063,   -2.1951,
+                -0.0000,   -1.0000,    0.0000,    2.9029,
+                -0.0063,         0,   -1.0000,    0.0700,
+                      0,         0,         0,    1.0000;
+
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+
+    // test a contact frame transform
+    m = testRover.getTransforms()[5];
+    compare << -1.0000,   -0.0000,        0,   -2.1951,
+                0.0000,   -1.0000,        0,    2.9029,
+                     0,         0,   1.0000,         0,
+                     0,         0,        0,    1.0000;
+
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
 }
  
 int main(int argc, char **argv) {

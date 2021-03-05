@@ -74,7 +74,7 @@ void testEigenMatrixArray(){
 }
 
 void printTransformList(Kinematics &rover){
-    std::cout << "Rover Pointer List" << std::endl;
+    std::cout << "Rover Transform List" << std::endl;
     std::array<Eigen::Matrix4d, 9> roverList = rover.getTransforms();
 
         for (std::array<Eigen::Matrix4d, 9>::iterator it = roverList.begin(); it != roverList.end();){
@@ -124,13 +124,15 @@ int main(int argc, char** argv)
         112.6422;
 
     Kinematics rover(0.1, 0.2, 0.1, 0.07, q1);
-    compare << -1.0000,   -0.0000,         0,    1.9951,
-                0.0000,   -1.0000,         0,   -3.0029,
+    compare << -1.0000,   -0.0000,        0,   -1.9951,
+                0.0000,   -1.0000,        0,    3.0029,
                     0,         0,    1.0000,    0.1700,
                     0,         0,         0,    1.0000;
 
 
-    // printTransformList(rover);
+    printTransformList(rover);
+    frobeniusNorm(rover.getTransforms()[0], compare);
+    std::cout << rover.getTransforms()[0].isApprox(compare, 0.01) << std::endl;
     // std::cout << rover.homogenousTransform(q1(Eigen::seq(0, 2)), q1(Eigen::seq(3, 5))) << std::endl;
     // testEigenMatrixArray();
     // testEigenSlice(rover);
