@@ -106,7 +106,7 @@ Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian()
     Eigen::Matrix4d eyeFour = Eigen::Matrix4d::Identity(4, 4);
     Eigen::Matrix3d omega;
 
-    omega(q_(Eigen::seq(0,3)), omega);
+    calculateOmega(q_(Eigen::seq(0, 2)), omega);
 
     vOutput.block(0, 0, 3, 3) << omega;
     vOutput.block(3, 3, 3, 3) << rotWorld_Base;
@@ -117,7 +117,7 @@ Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian()
 }
 
 // calculate omega
-void Kinematics::omega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega){
+void Kinematics::calculateOmega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega){
     /*
     This function takes in an orientation 3vector and calculates the omega matrix
     args:

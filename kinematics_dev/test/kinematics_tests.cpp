@@ -30,11 +30,11 @@ TEST_F(SkewTest, NegativeValues){
 }
 
 // *******************************************************************************************************
-// Kinematics::omega() tests
+// Kinematics::calculateOmega() tests
 TEST_F(OmegaTest, ZeroValue){
     // check with zero values
     ori << 0, 0, 0;
-    testRover.omega(ori, m);
+    testRover.calculateOmega(ori, m);
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
     compare(0, 0) = 1.0;
     compare(1, 1) = 1.0;
@@ -49,7 +49,7 @@ TEST_F(OmegaTest, ZeroValue){
 TEST_F(OmegaTest, NonZeroValue1){
     // check with non zero values
     ori << 0.4, 0.8, 0.9;
-    testRover.omega(ori, m);
+    testRover.calculateOmega(ori, m);
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
 
     // calculated with MATLAB, comparing to 3 sigfigs
@@ -68,7 +68,7 @@ TEST_F(OmegaTest, NonZeroValue1){
 TEST_F(OmegaTest, NonZeroValue2){
     // check with non zero values
     ori << 0.4, M_PI, -M_PI;
-    testRover.omega(ori, m);
+    testRover.calculateOmega(ori, m);
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
 
     // calculated with MATLAB, comparing to 3 sigfigs
@@ -87,7 +87,7 @@ TEST_F(OmegaTest, NonZeroValue2){
 TEST_F(OmegaTest, NonZeroValuePI){
     // check with non zero values
     ori << M_PI, M_PI, -M_PI;
-    testRover.omega(ori, m);
+    testRover.calculateOmega(ori, m);
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
 
     // calculated with MATLAB, comparing to 3 sigfigs

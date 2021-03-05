@@ -108,6 +108,7 @@ int main(int argc, char** argv)
     Eigen::Matrix<double, 10, 1> q0 = Eigen::Matrix<double, 10, 1>::Zero();
     Eigen::Matrix<double, 10, 1> q1 = Eigen::Matrix<double, 10, 1>::Zero();
     Eigen::Matrix4d compare;
+    Eigen::Matrix3d omega;
 
     q0.block(6, 0, 4, 1) << 0.1, 0.4, 0.1, 0.2;
 
@@ -128,11 +129,11 @@ int main(int argc, char** argv)
                     0,         0,    1.0000,    0.1700,
                     0,         0,         0,    1.0000;
 
-    printTransformList(rover);
+
+    // printTransformList(rover);
+    // std::cout << rover.homogenousTransform(q1(Eigen::seq(0, 2)), q1(Eigen::seq(3, 5))) << std::endl;
     // testEigenMatrixArray();
     // testEigenSlice(rover);
-    // std::cout << rover.getTransforms()[0].isApprox(compare) << std::endl;
-    // frobeniusNorm(rover.getTransforms()[0], compare);
     // std::cout << "Size of Eigen 4d array: " << sizeof(Eigen::Matrix4d) << std::endl;
     // std::cout << "Size of Kinematics class: " << sizeof(Kinematics) << std::endl;
 

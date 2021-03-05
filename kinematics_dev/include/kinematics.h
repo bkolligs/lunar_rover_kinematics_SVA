@@ -56,7 +56,7 @@ class Kinematics
         Eigen::Matrix<double, 10, 10> spatialToCartesian();
 
         // for use in V(q)
-        void omega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega);
+        void calculateOmega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega);
 
         // included with class so there are less external dependencies
         void skew(const Eigen::Vector3d &v, Eigen::Matrix3d &skewSym);
