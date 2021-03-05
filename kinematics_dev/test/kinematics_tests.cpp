@@ -1,6 +1,7 @@
-// tests
+// test fixtures
 #include "SkewTest.h"
 #include "OmegaTest.h"
+#include "HomogTest.h"
 // general headers
 #include <gtest/gtest.h>
 #include <iostream>
@@ -60,7 +61,7 @@ TEST_F(OmegaTest, NonZeroValue1){
     // std::cout << m << std::endl;
 
 
-    ASSERT_TRUE(m.isApprox(compare, 3));
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
 }
 
 TEST_F(OmegaTest, NonZeroValue2){
@@ -70,16 +71,16 @@ TEST_F(OmegaTest, NonZeroValue2){
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
 
     // calculated with MATLAB, comparing to 3 sigfigs
-    compare(0, 0) = 1.0;
-    compare(1, 1) = 1.0;
-    compare(2, 2) = 1.0;
+    compare << 1.0,       0,       0, 
+                 0,  0.9211, -0.3894,
+                 0, -0.3894, -0.9211;
 
     // print out the matrices
     // std::cout << compare << std::endl;
     // std::cout << m << std::endl;
 
 
-    ASSERT_TRUE(m.isApprox(compare, 3));
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
 }
 
 TEST_F(OmegaTest, NonZeroValuePI){
@@ -89,16 +90,106 @@ TEST_F(OmegaTest, NonZeroValuePI){
     Eigen::Matrix3d compare = Eigen::Matrix3d::Zero();
 
     // calculated with MATLAB, comparing to 3 sigfigs
-    compare << 1.0,    0.0,     0.0,
-                 0, 0.9211, -0.3894,
-                 0, 0.3894, -0.9211;
-
+    compare << 1.0,    0,   0,
+                 0, -1.0,   0, 
+                 0,    0, 1.0;
     // print out the matrices
     // std::cout << compare << std::endl;
     // std::cout << m << std::endl;
 
 
-    ASSERT_TRUE(m.isApprox(compare, 3));
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+}
+
+// *******************************************************************************************************
+// Kinematics::homogeneousTransform tests
+TEST_F(HomogTest, RotationCorrectX){
+    ori << M_PI, 0, 0;
+    pos << 0, 0, 0;
+
+    compare <<   1.0,   0,   0,   0, 
+                   0,-1.0,   0,   0,
+                   0,   0,-1.0,   0,
+                   0,   0,   0, 1.0;
+
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+
+    ori <<  M_PI/6, 0, 0;
+    pos << 0.001, 0.1, 1;
+    compare <<    1.0,     0,     0, 0.001, 
+                    0, 0.866,  -0.5,   0.1,
+                    0,   0.5, 0.866,     1,
+                    0,     0,     0,     1;
+ 
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.001));
+}
+
+TEST_F(HomogTest, RotationCorrectY){
+    ori << 0, M_PI, 0;
+    pos << 0, 0, 0;
+
+    compare <<     0,   0, 1.0,   0, 
+                   0, 1.0,   0,   0,
+                -1.0,   0,   0,   0,
+                   0,   0,   0, 1.0;
+
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 1));
+
+    ori << 0, M_PI/6, 0;
+    pos << 0.001, 0.1, 0;
+    compare <<    0.866, 0, 0.5, 0.001, 
+                    0, 1,     0,   0.1,
+                 -0.5, 0, 0.866,     0,
+                    0, 0,     0,     1;
+
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+}
+
+TEST_F(HomogTest, RotationCorrectZ){
+    ori << 0, 0, M_PI;
+    pos << 0, 0, 0;
+
+    compare << -1.0,    0,   0,   0, 
+                  0, -1.0,   0,   0,
+                  0,    0, 1.0,   0,
+                  0,    0,   0, 1.0;
+ 
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.01));
+
+    ori << 0, 0, M_PI / 6;
+    pos << 0.001, 0.1, 1;
+    compare << 0.866,    -0.5, 0, 0.001, 
+                 0.5, 0.866, 0,   0.1,
+                   0,     0, 1,     1,
+                   0,     0, 0,     1;
+
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.001));
+}
+
+TEST_F(HomogTest, FullEulerAngles){
+    ori << M_PI/3, -M_PI/6, M_PI/6;
+    pos << 2, 3, 5;
+    compare << 0.7500,  -0.6250,   0.2165,    2.0000,
+               0.4330,   0.2165,  -0.8750,    3.0000,
+               0.5000,   0.7500,   0.4330,    5.0000,
+                    0,        0,        0,    1.0000;
+    
+    m = testRover.homogenousTransform(ori, pos);
+
+    ASSERT_TRUE(m.isApprox(compare, 0.001));
+
 }
  
 int main(int argc, char **argv) {

@@ -41,6 +41,9 @@ class Kinematics
         // actuation kinematics
         Eigen::Matrix<double, 10, 1> actuation();
 
+        // theta is joint angle, pos is translation from parent frame
+        Eigen::Matrix4d homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos);
+
         // calculate V(q)
         Eigen::Matrix<double, 10, 10> spatialToCartesian(Eigen::Matrix<double, 10, 1> q);
 

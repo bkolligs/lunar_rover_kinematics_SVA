@@ -32,6 +32,37 @@ Eigen::Matrix<double, 10, 1> Kinematics::actuation()
 
 }
 
+// theta is joint angle, pos is translation from parent frame
+Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos){
+    Eigen::Matrix4d homogTransform = Eigen::Matrix4d::Zero();
+    Eigen::Matrix3d rotationX;
+    Eigen::Matrix3d rotationY;
+    Eigen::Matrix3d rotationZ;
+
+    double alpha = ori(0);
+    rotationX << 1,          0,           0,
+                 0, cos(alpha), -sin(alpha), 
+                 0, sin(alpha),  cos(alpha);
+    
+    double beta = ori(1);
+    rotationY << cos(beta), 0, sin(beta),
+                         0, 1,         0,
+                -sin(beta), 0, cos(beta);
+
+    double gamma = ori(2);
+    rotationZ << cos(gamma), -sin(gamma), 0,
+                 sin(gamma),  cos(gamma), 0, 
+                          0,           0, 1;
+
+    // populate rotation of HT
+    homogTransform(3, 3) = 1.0;
+    homogTransform.block(0,0,3,3) << rotationZ * rotationY * rotationX;
+    homogTransform.block(0, 3, 3, 1) << pos;
+
+    return homogTransform;
+}
+
+
 // calculate V(q)
 Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian(Eigen::Matrix<double, 10, 1> q)
 {
