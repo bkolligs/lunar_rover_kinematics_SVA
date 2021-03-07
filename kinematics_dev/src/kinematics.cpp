@@ -52,6 +52,45 @@ void Kinematics::updateTransforms(){
 
 // calculate the jacobian
 void Kinematics::jacobian(){
+    
+    const Eigen::Matrix4d * transWorld_Base = &transformList[0];
+    Eigen::Matrix3d rotWorld_Base = transWorld_Base->block(0, 0, 3, 3);
+    Eigen::Vector3d dWorld_Base = transWorld_Base->block(0, 3, 3, 1);
+    Eigen::Matrix4d * transWorld_Joint;
+    Eigen::Matrix4d * transWorld_Contact;
+    Eigen::Matrix3d rotWorld_Joint;
+    Eigen::Vector3d dWorld_Joint;
+    Eigen::Matrix3d rotWorld_Contact;
+    Eigen::Vector3d dWorld_Contact;
+    Eigen::Vector3d jointAxisWorld;
+    Eigen::Vector3d dispJoint_Contact;
+    
+    // populate the jacobian for each wheel
+    for (int i = 1; i <= nWheels_;i++){
+        transWorld_Joint = &transformList[i];
+        transWorld_Contact = &transformList[i+4];
+
+        // transforms to joint frame
+        rotWorld_Joint = transWorld_Joint->block(0, 0, 3, 3);
+        dWorld_Joint = transWorld_Joint->block(0, 3, 3, 1);
+
+        // transforms to contact frame
+        rotWorld_Contact = transWorld_Contact->block(0, 0, 3, 3);
+        dWorld_Contact = transWorld_Contact->block(0, 3, 3, 1);
+
+        // joint axes are all along the y-axis
+        jointAxisWorld = rotWorld_Joint.col(1);
+
+        // translation
+        dispJoint_Contact = dWorld_Contact - dWorld_Joint;
+
+        // put a x d in the appropriate column
+        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), i+5) = jointAxisWorld.cross(dispJoint_Contact);
+        // place body information
+        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 2)) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
+        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(3, 5)) = rotWorld_Base;
+        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 9)) = rotWorld_Contact.transpose() * jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 9));
+    }
 
 }
 
@@ -99,12 +138,13 @@ Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, cons
 Eigen::Matrix<double, 10, 10> Kinematics::spatialToCartesian()
 {
     Eigen::Matrix<double, 10, 10> vOutput = Eigen::Matrix<double, 10, 10>::Zero();
-    Eigen::Matrix4d transWorld_Base = transformList[0];
-    Eigen::Matrix3d rotWorld_Base = transWorld_Base.block(0, 0, 3, 3);
+    const Eigen::Matrix4d * transWorld_Base = &transformList[0];
+    Eigen::Matrix3d rotWorld_Base = transWorld_Base->block(0, 0, 3, 3);
     Eigen::Matrix4d eyeFour = Eigen::Matrix4d::Identity(4, 4);
     Eigen::Matrix3d omega;
-
-    calculateOmega(q_(Eigen::seq(0, 2)), omega);
+    
+    // assumes curWorldOri has been updated with most recent state vector
+    calculateOmega(curWorldOri, omega);
 
     // populate V(q) with these matrices
     vOutput.block(0, 0, 3, 3) << omega;
@@ -132,7 +172,7 @@ void Kinematics::calculateOmega(const Eigen::Vector3d &orientation, Eigen::Matri
 }
 
 // skew symmetric matrix froma vector
-void Kinematics::skew(const Eigen::Vector3d &v, Eigen::Matrix3d & skewSym)
+Eigen::Matrix3d Kinematics::skew(const Eigen::Vector3d &v)
 {
     /*
     This function takes in a 3vector and modifies a predefined skew symmetric matrix
@@ -140,9 +180,11 @@ void Kinematics::skew(const Eigen::Vector3d &v, Eigen::Matrix3d & skewSym)
         v - 3vector to convert to skew symmetric
         skewSym - reference to skew symmetric matrix
     */
+    Eigen::Matrix3d skewSym;
     skewSym <<   0, -v(2),  v(1),
               v(2),     0, -v(0),
              -v(1),  v(0),     0;
+    return skewSym;
 }
 
 Eigen::Matrix<double, 10, 1> & Kinematics::getState(){
@@ -151,4 +193,8 @@ Eigen::Matrix<double, 10, 1> & Kinematics::getState(){
 
 std::array<Eigen::Matrix4d, 9> Kinematics::getTransforms(){
     return transformList;
+}
+
+Eigen::Matrix<double, 12, 10> Kinematics::getJacobian(){
+    return jacobianMatrix_;
 }

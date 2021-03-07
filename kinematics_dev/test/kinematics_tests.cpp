@@ -3,6 +3,7 @@
 #include "OmegaTest.h"
 #include "HomogTest.h"
 #include "TransformTest.h"
+#include "JacobianTest.h"
 // general headers
 #include <gtest/gtest.h>
 #include <iostream>
@@ -12,20 +13,20 @@
 TEST_F(SkewTest, PositiveValues){
     // check with non zero values
     v << 1, 2, 3;
-    testRover.skew(v, m);
+    m = testRover.skew(v);
     ASSERT_TRUE(m.transpose().isApprox(-m));
 }
 
 TEST_F(SkewTest, ZeroValues){
     // check zero values
     v << 0, 0, 0;
-    testRover.skew(v, m);
+    m = testRover.skew(v);
     ASSERT_TRUE(m.transpose().isApprox(-m));
 }
 
 TEST_F(SkewTest, NegativeValues){
     v << -1, -2, -3;
-    testRover.skew(v, m);
+    m = testRover.skew(v);
     ASSERT_TRUE(m.transpose().isApprox(-m));
 }
 
@@ -195,7 +196,7 @@ TEST_F(HomogTest, FullEulerAngles){
 
 // *******************************************************************************************************
 // Kinematics::updateTransforms tests
-TEST_F(TransformTest, TransformListTest){
+TEST_F(TransformTest, TransformListTestWorld){
     // test world to body transform
     m = testRover.getTransforms()[0];
     compare << -1.0000,   -0.0000,        0,   -1.9951,
@@ -203,7 +204,10 @@ TEST_F(TransformTest, TransformListTest){
                     0,         0,    1.0000,    0.1700,
                     0,         0,         0,    1.0000;
 
-    ASSERT_TRUE(m.isApprox(compare, 0.01));
+    ASSERT_TRUE(m.isApprox(compare, 0.0001));
+}
+
+TEST_F(TransformTest, TransformListTestJoint){
 
     // test a joint location transform
     m = testRover.getTransforms()[1];
@@ -212,7 +216,10 @@ TEST_F(TransformTest, TransformListTest){
                 -0.0063,         0,   -1.0000,    0.0700,
                       0,         0,         0,    1.0000;
 
-    ASSERT_TRUE(m.isApprox(compare, 0.01));
+    ASSERT_TRUE(m.isApprox(compare, 0.0001));
+}
+
+TEST_F(TransformTest, TransformListTestContact){
 
     // test a contact frame transform
     m = testRover.getTransforms()[5];
@@ -221,7 +228,29 @@ TEST_F(TransformTest, TransformListTest){
                      0,         0,   1.0000,         0,
                      0,         0,        0,    1.0000;
 
-    ASSERT_TRUE(m.isApprox(compare, 0.01));
+    ASSERT_TRUE(m.isApprox(compare, 0.0001));
+}
+
+
+
+TEST_F(JacobianTest, JacobianMatrixTest){
+	testRover.jacobian();
+	m = testRover.getJacobian();
+    compare <<
+         0,   -0.1700,   -0.1000,    1.0000,         0,         0,   -0.0700,         0,         0,         0,
+    0.1700,         0,    0.2000,         0,    1.0000,         0,         0,         0,         0,         0,
+    0.1000,   -0.2000,         0,         0,         0,    1.0000,         0,         0,         0,         0,
+         0,   -0.1700,    0.1000,    1.0000,         0,         0,         0,   -0.0700,         0,         0,
+    0.1700,         0,    0.2000,         0,    1.0000,         0,         0,         0,         0,         0,
+   -0.1000,   -0.2000,         0,         0,         0,    1.0000,         0,         0,         0,         0,
+         0,   -0.1700,   -0.1000,    1.0000,         0,         0,         0,         0,   -0.0700,         0,
+    0.1700,         0,   -0.2000,         0,    1.0000,         0,         0,         0,         0,         0,
+    0.1000,    0.2000,         0,         0,         0,    1.0000,         0,         0,         0,         0,
+         0,   -0.1700,    0.1000,    1.0000,         0,         0,         0,         0,         0,   -0.0700,
+    0.1700,         0,   -0.2000,         0,    1.0000,         0,         0,         0,         0,         0,
+   -0.1000,    0.2000,         0,         0,         0,    1.0000,         0,         0,         0,         0;
+
+   ASSERT_TRUE(m.isApprox(compare, 0.0001));
 }
  
 int main(int argc, char **argv) {

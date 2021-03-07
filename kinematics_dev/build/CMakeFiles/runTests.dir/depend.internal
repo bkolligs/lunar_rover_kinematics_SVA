@@ -4,6 +4,7 @@
 CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o
  ../include/kinematics.h
  ../test/include_tests/HomogTest.h
+ ../test/include_tests/JacobianTest.h
  ../test/include_tests/OmegaTest.h
  ../test/include_tests/SkewTest.h
  ../test/include_tests/TransformTest.h

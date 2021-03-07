@@ -200,7 +200,7 @@ classdef kinematicMR < handle
                 aWheel(:, i + 5) = cross(axis, d);
 
                 % insert body information orientation then translation
-                aWheel(:, 1:3) = skew(d_w2c - d_w2b)'*R_w2b;
+                aWheel(:, 1:3) = skew(d_w2c - d_w2b)'*R_w2b
                 aWheel(:, 4:6) = R_w2b;
                 aWheel = R_w2c' * aWheel;
                 % insert wheel into stack

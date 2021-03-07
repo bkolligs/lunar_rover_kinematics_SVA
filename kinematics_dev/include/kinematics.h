@@ -30,7 +30,7 @@ class Kinematics
         // wheel contact point constraints
         Eigen::Matrix<double, 12, 1> contactConstraints_ = Eigen::Matrix<double, 12, 1>::Zero();
         // jacobian matrix
-        Eigen::Matrix<double, 12, 10> jacobianMatrix_;
+        Eigen::Matrix<double, 12, 10> jacobianMatrix_ = Eigen::Matrix<double, 12, 10>::Zero();
         // array of transformation matrices
         std::array<Eigen::Matrix4d, 9> transformList;
 
@@ -59,11 +59,13 @@ class Kinematics
         void calculateOmega(const Eigen::Vector3d &orientation, Eigen::Matrix3d &omega);
 
         // included with class so there are less external dependencies
-        void skew(const Eigen::Vector3d &v, Eigen::Matrix3d &skewSym);
+        Eigen::Matrix3d skew(const Eigen::Vector3d &v);
 
         Eigen::Matrix<double, 10, 1> & getState();
 
         std::array<Eigen::Matrix4d, 9> getTransforms();
+
+        Eigen::Matrix<double, 12, 10> getJacobian();
 };
 
 

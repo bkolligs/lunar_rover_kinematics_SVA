@@ -22,6 +22,12 @@ kinematics.h
 gtest/gtest.h
 -
 
+../test/include_tests/JacobianTest.h
+kinematics.h
+../test/include_tests/kinematics.h
+gtest/gtest.h
+-
+
 ../test/include_tests/OmegaTest.h
 kinematics.h
 ../test/include_tests/kinematics.h
@@ -49,6 +55,8 @@ HomogTest.h
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/HomogTest.h
 TransformTest.h
 /home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/TransformTest.h
+JacobianTest.h
+/home/benjamin/moonranger/lunar_rover_kinematics_SVA/kinematics_dev/test/JacobianTest.h
 gtest/gtest.h
 -
 iostream

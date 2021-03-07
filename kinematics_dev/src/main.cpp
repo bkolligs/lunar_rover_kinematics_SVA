@@ -99,18 +99,19 @@ void frobeniusNorm(Eigen::Matrix4d m, Eigen::Matrix4d compare){
     std::cout << "Comparing: " << std::endl << m << std::endl << compare << std::endl;
     std::cout << m - compare << std::endl;
     std::cout << "M Norm: " << mNorm << " Compare Norm: "<< compareNorm << std::endl;
-    std::cout << "Diff Norm: " << diffNorm << " Same Matrix: " << (diffNorm <= std::min(mNorm, compareNorm)) << std::endl;
+    std::cout << "Diff Norm: " << diffNorm << " Same Matrix? " << (diffNorm <= std::min(mNorm, compareNorm)) << std::endl;
 
 }
 
-int main(int argc, char** argv)
-{
-    Eigen::Matrix<double, 10, 1> q0 = Eigen::Matrix<double, 10, 1>::Zero();
-    Eigen::Matrix<double, 10, 1> q1 = Eigen::Matrix<double, 10, 1>::Zero();
-    Eigen::Matrix4d compare;
-    Eigen::Matrix3d omega;
+void currentSizes(){
+    std::cout << "Size of Eigen 4d array: " << sizeof(Eigen::Matrix4d) << std::endl;
+    std::cout << "Size of Kinematics class: " << sizeof(Kinematics) << std::endl;
+}
 
-    q0.block(6, 0, 4, 1) << 0.1, 0.4, 0.1, 0.2;
+void testRoverTransformsAndJacobian(){
+    Eigen::Matrix<double, 10, 1> q1 = Eigen::Matrix<double, 10, 1>::Zero();
+
+    Eigen::Matrix4d compare;
 
     q1 <<      0,
                0,
@@ -129,15 +130,73 @@ int main(int argc, char** argv)
                     0,         0,    1.0000,    0.1700,
                     0,         0,         0,    1.0000;
 
-
-    printTransformList(rover);
     frobeniusNorm(rover.getTransforms()[0], compare);
     std::cout << rover.getTransforms()[0].isApprox(compare, 0.01) << std::endl;
-    // std::cout << rover.homogenousTransform(q1(Eigen::seq(0, 2)), q1(Eigen::seq(3, 5))) << std::endl;
+    
+    printTransformList(rover);
+
+    std::cout << "Rover Jacobian: " << std::endl << rover.getJacobian() << std::endl;
+    rover.jacobian();
+
+    std::cout << "Rover Jacobian: " << std::endl << rover.getJacobian() << std::endl;
+
+}
+
+
+void testEigenMatrixPointers(){
+    // goal is to evaluate whether its more space efficient to assign blocks to a matrix3d, or use a pointer to a block object
+    // can't take a pointer to a block because it is temporary in the function call
+
+    Eigen::Matrix4d compare = Eigen::Matrix4d::Identity();
+    Eigen::Matrix4d * p_compare = &compare;
+    Eigen::Matrix3d blockCopy = compare.block(0, 0, 3, 3);
+    Eigen::Block<Eigen::Matrix4d> block = compare.block(0, 0, 3, 3);
+    Eigen::Block<Eigen::Matrix4d> * p_block = &block;
+
+
+
+    // test out constant pointers
+    const Eigen::Matrix4d * cp_compare = &compare;
+    Eigen::Matrix3d c_block = cp_compare->block(0, 0, 3, 3);
+    // can't call a pointer directly to the block object because it is taking an address of a temporary variable :(
+    const Eigen::Block<const Eigen::Matrix4d> cp_block = cp_compare->block(0, 0, 3, 3);
+    // vector size compare
+    Eigen::Vector3d testVec = compare.block(0, 3, 3, 1);
+    // so basically the block is constant size...so I think assignment  to vector and matrix is fine
+    const Eigen::Block<const Eigen::Matrix4d> cp_blockVector = cp_compare->block(0, 3, 3, 1);
+
+
+    // change block to see if these are aliased or copied
+    block(2, 2) = 5.0;
+    // this also works
+    (*p_block)(0, 0) = 9.0;
+
+    std::cout << "Pointer to Matrix: " << p_compare << std::endl;
+    std::cout << "Pointer to block: " << p_block << std::endl;
+    std::cout << "Deref Pointer to block slice: " << std::endl << *p_block << std::endl;
+    std::cout << "Block objects are aliased: " << std::endl << block << std::endl << compare << std::endl;
+    std::cout << "Matrix4d Block size: " << sizeof(block) << ". Size of pointer to Matrix4d block: " << sizeof(p_block) << ". Size of Matrix3d: " << sizeof(blockCopy) << std::endl;
+    std::cout << "Size of constant vector block: " << sizeof(cp_blockVector) << ". Size of Vector3d: " << sizeof(testVec) << std::endl; 
+
+}
+
+int main(int argc, char** argv)
+{
+    Eigen::Matrix<double, 10, 1> q0 = Eigen::Matrix<double, 10, 1>::Zero();
+    Eigen::Matrix<double, 10, 1> q1 = Eigen::Matrix<double, 10, 1>::Zero();
+
+    Eigen::Matrix3d omega;
+
+    q0.block(6, 0, 4, 1) << 0.1, 0.4, 0.1, 0.2;
+
+    Kinematics rover(0.1, 0.2, 0.1, 0.07, q0);
+
+    testRoverTransformsAndJacobian();
+    // testEigenMatrixPointers();
     // testEigenMatrixArray();
     // testEigenSlice(rover);
-    // std::cout << "Size of Eigen 4d array: " << sizeof(Eigen::Matrix4d) << std::endl;
-    // std::cout << "Size of Kinematics class: " << sizeof(Kinematics) << std::endl;
+    // currentSizes();
+
 
     return 0;
 }
