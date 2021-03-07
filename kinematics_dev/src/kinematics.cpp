@@ -89,20 +89,42 @@ void Kinematics::jacobian(){
         // place body information
         jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 2)) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
         jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(3, 5)) = rotWorld_Base;
-        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 9)) = rotWorld_Contact.transpose() * jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 9));
+        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all) = rotWorld_Contact.transpose() * jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all);
     }
 
 }
 
-// navigation kinematics
-void Kinematics::navigation(){
 
+// perform the math to predict motion
+void Kinematics::motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float deltaT, KinematicDirection direction){
+    Eigen::Matrix<double, 6, 1> bodyVelocity = q_dot(Eigen::seq(0, 5));
+    Eigen::Vector4d jointRates = q_dot(Eigen::seq(6, 9));
+
+    q_dot_ = q_dot;
+    updateTransforms();
+    jacobian();
+
+    Eigen::Matrix<double, 12, 6> jacobianBody = jacobianMatrix_(Eigen::all, Eigen::seq(0, 5));
+    Eigen::Matrix<double, 12, 4> jacobianWheels = jacobianMatrix_(Eigen::all, Eigen::seq(6, 9));
+
+
+    if (direction == NAVIGATION){
+        bodyVelocity = jacobianBody.completeOrthogonalDecomposition().pseudoInverse() * (contactConstraints_ - jacobianWheels*jointRates);
+    }
+    else if (direction == ACTUATION){
+        jointRates = jacobianWheels.completeOrthogonalDecomposition().pseudoInverse() * (contactConstraints_ - jacobianBody*bodyVelocity);
+    }
+    else{
+        throw "Direction must be either 'NAVIGATION' or 'ACTUATION'.";
+    }
+
+    q_dot_(Eigen::seq(0, 5)) = bodyVelocity;
+    q_dot_(Eigen::seq(6, 9)) = jointRates;
+
+    // perform Euler method step
+    q_ += (spatialToCartesian()*q_dot_)*deltaT;
 }
 
-// actuation kinematics
-void Kinematics::actuation(){
-
-}
 
 Eigen::Matrix4d Kinematics::homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos){
     Eigen::Matrix4d homogTransform = Eigen::Matrix4d::Zero();

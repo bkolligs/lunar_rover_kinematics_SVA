@@ -1,8 +1,12 @@
 #pragma once
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/QR>
 #include <iostream>
 #include <array>
 #include <math.h>
+
+// kinematic direction
+enum KinematicDirection {NAVIGATION, ACTUATION};
 
 class Kinematics
 {
@@ -44,11 +48,8 @@ class Kinematics
         // calculate the jacobian
         void jacobian();
 
-        // navigation kinematics
-        void navigation();
-
-        // actuation kinematics
-        void actuation();
+        // perform the math to predict motion
+        void motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float deltaT, KinematicDirection direction);
 
         Eigen::Matrix4d homogenousTransform(const Eigen::Vector3d &ori, const Eigen::Vector3d &pos);
 

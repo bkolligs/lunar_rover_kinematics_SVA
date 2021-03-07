@@ -11,6 +11,8 @@
 ../include/kinematics.h
 eigen3/Eigen/Dense
 -
+eigen3/Eigen/QR
+-
 iostream
 -
 array
