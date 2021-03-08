@@ -1,1 +1,1 @@
-/usr/bin/g++-7   -O1 -O2 -g    -rdynamic CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o  -o runTests -Wl,-Bstatic -lgtest -Wl,-Bdynamic -lpthread libkinematics.a 
+/usr/bin/g++-7   -Ofast -g    -rdynamic CMakeFiles/runTests.dir/test/kinematics_tests.cpp.o  -o runTests -Wl,-Bstatic -lgtest -Wl,-Bdynamic -lpthread libkinematics.a 
