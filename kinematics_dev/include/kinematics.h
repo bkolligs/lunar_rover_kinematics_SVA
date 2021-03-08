@@ -24,7 +24,7 @@ class Kinematics
         // rover translation table
         Eigen::Matrix<double, 4, 3> configurationTable;
 
-        // current vehicle state
+        // current vehicle state [phi, theta, psi, x, y, z, fl, fr, bl, br]
         Eigen::Matrix<double, 10, 1> q_;
         // current pose orientation from world frame, position in cartesian
         Eigen::Vector3d curWorldOri;

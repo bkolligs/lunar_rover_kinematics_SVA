@@ -255,7 +255,7 @@ void testMotionPrediction(){
     std::cout << "Rover State: " << std::endl << rover.getState() << std::endl;
     rover.motionPrediction(q1dot, 0.01, direction);
     std::cout << "Rover State: " << std::endl << rover.getState() << std::endl;
-    std::cout << "Correct? " << compare.isApprox(rover.getState(), 1) << std::endl;
+    std::cout << "Correct? " << compare.isApprox(rover.getState(), 0.0001) << std::endl;
     // check the norms
     frobeniusNorm<Eigen::Matrix<double, 10, 1>>(rover.getState(), compare);
 }

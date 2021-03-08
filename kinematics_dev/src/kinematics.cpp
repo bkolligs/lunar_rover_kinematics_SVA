@@ -97,10 +97,10 @@ void Kinematics::jacobian(){
 
 // perform the math to predict motion
 void Kinematics::motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float deltaT, KinematicDirection direction){
+    
+    q_dot_ = q_dot;
     Eigen::Matrix<double, 6, 1> bodyVelocity = q_dot(Eigen::seq(0, 5));
     Eigen::Vector4d jointRates = q_dot(Eigen::seq(6, 9));
-
-    q_dot_ = q_dot;
     updateTransforms();
     jacobian();
 

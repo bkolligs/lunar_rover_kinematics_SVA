@@ -4,6 +4,7 @@
 #include "HomogTest.h"
 #include "TransformTest.h"
 #include "JacobianTest.h"
+#include "MotionTest.h"
 // general headers
 #include <gtest/gtest.h>
 #include <iostream>
@@ -251,6 +252,454 @@ TEST_F(JacobianTest, JacobianMatrixTest){
    -0.1000,    0.2000,         0,         0,         0,    1.0000,         0,         0,         0,         0;
 
    ASSERT_TRUE(m.isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionTestActuationOne){
+    // initial position
+     q0 << 0,
+           0,
+      3.1416,
+     -1.9951,
+      3.0029,
+      0.1700,
+    103.6662,
+    112.6422,
+    103.6662,
+    112.6422;
+
+    // desired body speed
+    qdotInput << 0,
+                 0,
+                 0,
+                 3,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0;
+
+    compare << 0,
+               0,
+          3.1416,
+         -2.0251,
+          3.0029,
+          0.1700,
+        104.0948,
+        113.0708,
+        104.0948,
+        113.0708;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    direction = ACTUATION;
+    deltaT = 0.01;
+    testRover.motionPrediction(qdotInput, deltaT, direction);
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionTestActuationTwo){
+        // initial position
+     q0 << 0,
+           0,
+      3.1416,
+     -1.9951,
+      3.0029,
+      0.1700,
+    103.6662,
+    112.6422,
+    103.6662,
+    112.6422;
+
+    // desired body speed
+    qdotInput << 0,
+                 0,
+                 0,
+             -1000,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+
+    compare << 0,
+               0,
+          3.1416,
+          8.0049,
+          3.0029,
+          0.1700, 
+        -39.1909,
+        -30.2149,
+        -39.1909,
+        -30.2149;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    direction = ACTUATION;
+    deltaT = 0.01;
+    testRover.motionPrediction(qdotInput, deltaT, direction);
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionTestActuationYawAndX){
+        // initial position
+     q0 << 0,
+           0,
+      3.1416,
+     -1.9951,
+      3.0029,
+      0.1700,
+    103.6662,
+    112.6422,
+    103.6662,
+    112.6422;
+
+    // desired body speed
+    qdotInput << 0,
+                 0,
+           -3.1416,
+           -1.0000,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0;
+
+    compare << 0,
+               0,
+          3.1102,
+         -1.9851,
+          3.0029,
+          0.1700,
+        103.5683,
+        112.4545,
+        103.5683,
+        112.4545;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    direction = ACTUATION;
+    deltaT = 0.01;
+    testRover.motionPrediction(qdotInput, deltaT, direction);
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionTestNavigationOne){
+        // initial position all zeros
+
+    // desired body speed
+    qdotInput << 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 3,
+                 2,
+                 4,
+                 3;
+
+    compare << -0.0000,
+                0.0000,
+               -0.0007,
+                0.0021,
+                0.0000,
+                0.1700,
+                0.0300,
+                0.0200,
+                0.0400,
+                0.0300;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    direction = NAVIGATION;
+    deltaT = 0.01;
+    testRover.motionPrediction(qdotInput, deltaT, direction);
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionTestNavigationTwo){
+        // initial position all zeros
+
+    // desired body speed
+    qdotInput << 0,
+                 0,
+                 0,
+                 0,
+                 0,
+                 0,
+           -3.6000,
+            4.6000,
+           -4.2100,
+            5.0000;
+
+    compare << 0.0000,
+              -0.0000,
+               0.0061,
+               0.0003,
+              -0.0000,
+               0.1700,
+              -0.0360,
+               0.0460,
+              -0.0421,
+               0.0500;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    direction = NAVIGATION;
+    deltaT = 0.01;
+    testRover.motionPrediction(qdotInput, deltaT, direction);
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionSequenceActuationForward){
+    direction = ACTUATION;
+    deltaT = 0.01;
+
+    int simStart = 0;
+    int simEndSec = 10;
+    int simEnd = simEndSec/deltaT;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    for (int t = 0; t <= simEnd; t ++){
+        qdotInput << 0,
+                     0,
+                     0,
+                     5,
+                     0,
+                     0,
+                     0,
+                     0,
+                     0,
+                     0;
+
+        testRover.motionPrediction(qdotInput, deltaT, direction);
+    }
+
+    compare << 0,
+               0,
+               0,
+         50.0500,
+               0,
+          0.1700,
+        715.0000,
+        715.0000,
+        715.0000,
+        715.0000;
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionSequenceActuationRotate){
+    direction = ACTUATION;
+    deltaT = 0.01;
+
+    int simStart = 0;
+    int simEndSec = 10;
+    int simEnd = simEndSec/deltaT;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    for (int t = 0; t <= simEnd; t ++){
+        qdotInput << 0,
+                     0,
+                2*M_PI,
+                     0,
+                     0,
+                     0,
+                     0,
+                     0,
+                     0,
+                     0;
+
+        testRover.motionPrediction(qdotInput, deltaT, direction);
+    }
+
+    compare << 0,
+               0,
+         62.8947,
+               0,
+               0,
+          0.1700,
+        -89.8495,
+         89.8495,
+        -89.8495,
+         89.8495;
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionSequenceActuationTurn){
+    direction = ACTUATION;
+    deltaT = 0.01;
+
+    int simStart = 0;
+    int simEndSec = 10;
+    int simEnd = simEndSec/deltaT;
+    float driveArcRadius = 0.5;
+    float driveArcVelocity = M_PI/4;
+    float driveArcSecond = 4;
+    float driveArcPsiDot = driveArcVelocity/(driveArcRadius*driveArcSecond);
+    float driveArcXDot = driveArcVelocity/driveArcSecond;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    for (int t = 0; t <= simEnd; t ++){
+        if (t > 0 && t <= 0.1*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         1,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0;     
+        }
+        else if (t > 0.1*simEnd && t<=0.5*simEnd){
+            qdotInput << 0,
+                         0,
+            driveArcPsiDot,
+              driveArcXDot,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0;     
+        }
+        else if (t > 0.5*simEnd && t<=0.7*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         1,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0;    
+        }
+
+        else{
+            qdotInput = Eigen::Matrix<double, 10, 1>::Zero();
+        }
+
+        testRover.motionPrediction(qdotInput, deltaT, direction);
+    }
+
+    compare << 0,
+               0,
+          1.5708,
+          1.5010,
+          2.4990,
+          0.1700,
+         51.8331,
+         56.3211,
+         51.8331,
+         56.3211;
+
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
+}
+
+TEST_F(MotionTest, MotionSequenceNavigation){
+    direction = NAVIGATION;
+    deltaT = 0.01;
+
+    int simStart = 0;
+    int simEndSec = 10;
+    int simEnd = simEndSec/deltaT;
+
+    Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
+
+    for (int t = 0; t <= simEnd; t ++){
+        if (t > 0 && t <= 0.25*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                      M_PI,
+                      M_PI,
+                      M_PI,
+                      M_PI;   
+        }
+        else if (t > 0.25*simEnd && t<=0.5*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                    2*M_PI,
+                   -2*M_PI,
+                    2*M_PI,
+                   -2*M_PI;    
+        }
+        else if (t > 0.5*simEnd && t<=0.75*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                      M_PI,
+                      M_PI,
+                      M_PI,
+                      M_PI;     
+        }
+        else if (t > 0.75*simEnd && t<=0.9*simEnd){
+            qdotInput << 0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                    4*M_PI,
+                         0,
+                    6*M_PI;     
+        }
+        else{
+            qdotInput << 0,
+                         0,
+                         0,
+                         0,
+                         0,
+                         0,
+                      M_PI,
+                      M_PI,
+                      M_PI,
+                      M_PI;
+        }
+
+        testRover.motionPrediction(qdotInput, deltaT, direction);
+    }
+
+    compare << 0.0000,
+              -0.0000,
+              -0.5498,
+               0.5553,
+              -1.2818,
+               0.1700,
+              34.5889,
+              22.0226,
+              34.5889,
+              31.4473;
+
+
+    ASSERT_TRUE(testRover.getState().isApprox(compare, 0.0001));
 }
  
 int main(int argc, char **argv) {

@@ -20,8 +20,7 @@ class JacobianTest: public ::testing::Test {
     Kinematics testRover = {0.1, 0.2, 0.1, 0.07, q0};
     Eigen::Matrix<double, 12, 10> m;
     Eigen::Matrix<double, 12, 10> compare;
-    Eigen::Vector3d ori;
-    Eigen::Vector3d pos;
+    
     double mNorm;
     double compareNorm;
     double diffNorm;
