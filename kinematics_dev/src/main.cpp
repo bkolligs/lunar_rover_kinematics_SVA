@@ -5,6 +5,26 @@
 #include <eigen3/Eigen/QR>
 #include <array>
 
+class TestRoverClass {
+    double w_ = 0.1;
+    double l_ = 0.2;
+    double h_ = 0.1;
+    double r_ = 0.07;
+
+    public:
+        Kinematics * classRover;
+
+        TestRoverClass(double w, double l, double h, double r, Eigen::Matrix<double, 10, 1>  init){
+            double w_ = w;
+            double l_ = l;
+            double h_ = h;
+            double r_ = r;
+
+            Kinematics rover(w_, l_, h_, r_, init);
+            classRover = &rover;
+
+        }
+};
 
 void testEigenMatrixCompare(Kinematics & rover){
     Eigen::Vector3d orientation;
@@ -260,6 +280,58 @@ void testMotionPrediction(){
     frobeniusNorm<Eigen::Matrix<double, 10, 1>>(rover.getState(), compare);
 }
 
+void testMotionPredictionWithClass(){
+    Eigen::Matrix<double, 10, 1> q1 = Eigen::Matrix<double, 10, 1>::Zero();
+    Eigen::Matrix<double, 10, 1> q1dot = Eigen::Matrix<double, 10, 1>::Zero();
+
+    Eigen::Matrix<double, 10, 1> compare;
+
+    q1 <<      0,
+               0,
+          3.1416,
+        - 1.9951,
+          3.0029,
+          0.1700,
+        103.6662,
+        112.6422,
+        103.6662,
+        112.6422;
+
+    q1dot << 0,
+             0,
+             0,
+             3,
+             0,
+             0,
+             0,
+             0,
+             0,
+             0;
+
+    compare << 0,
+               0,
+          3.1416,
+         -2.0251,
+          3.0029,
+          0.1700,
+        104.0948,
+        113.0708,
+        104.0948,
+        113.0708;
+
+    TestRoverClass rover {0.1, 0.2, 0.3, 0.07, q1};
+
+    // test actuation
+    KinematicDirection direction = ACTUATION;
+
+    std::cout << "Rover State: " << std::endl << rover.classRover->getState() << std::endl;
+    rover.classRover->motionPrediction(q1dot, 0.01, direction);
+    std::cout << "Rover State: " << std::endl << rover.classRover->getState() << std::endl;
+    std::cout << "Correct? " << compare.isApprox(rover.classRover->getState(), 0.0001) << std::endl;
+    // check the norms
+    frobeniusNorm<Eigen::Matrix<double, 10, 1>>(rover.classRover->getState(), compare);
+}
+
 int main(int argc, char** argv)
 {
     Eigen::Matrix<double, 10, 1> q0 = Eigen::Matrix<double, 10, 1>::Zero();
@@ -269,9 +341,16 @@ int main(int argc, char** argv)
 
     q0.block(6, 0, 4, 1) << 0.1, 0.4, 0.1, 0.2;
 
+    std::array<double, 10> testArrayAssign = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5};
+    Eigen::Matrix<double, 10, 1> q2 {testArrayAssign.data()};
+
+    // std::cout << q2 << std::endl;
+
+
     Kinematics rover(0.1, 0.2, 0.1, 0.07, q0);
 
-    testMotionPrediction();
+    testMotionPredictionWithClass();
+    // testMotionPrediction();
     // testJacobianPinv();
     // testRoverTransformsAndJacobian();
     // testEigenMatrixPointers();

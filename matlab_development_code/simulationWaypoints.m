@@ -39,51 +39,51 @@ elseif strcmp('act', direction)
     % desired body velocities...really only makes sense if x and y are
     % together
     % [phi_dot; theta_dot; psi_dot; x_dot; y_dot; z_dot]
-%     if time > 0 && time <= 0.1*total_time
-%         output = [0;
-%                   0;
-%                   0;
-%                   1;
-%                   0;
-%                   0];
-%     elseif time > 0.1*total_time && time <= 0.5*total_time
-%         [psi_dot, x_dot] = driveArcActuation(0.5, pi/4, 4);
-%         output = [0;
-%                   0;
-%                   psi_dot;
-%                   x_dot;
-%                   0;
-%                   0];
-%     elseif time > 0.5*total_time && time <= 0.7*total_time
-%         output = [0;
-%                   0;
-%                   0;
-%                   1;
-%                   0;
-%                   0];
-%     elseif time > 0.7*total_time && time <= 0.8*total_time
-%         [psi_dot, x_dot] = driveArcActuation(0.5, pi/4, 1);
-%         output = [0;
-%                   0;
-%                   psi_dot;
-%                   x_dot;
-%                   0;
-%                   0];
-%     elseif time > 0.8*total_time && time < total_time*0.9
-%         output = [0;
-%                   0;
-%                   0;
-%                   3;
-%                   0;
-%                   0];
-%     else
-%         output = [0;
-%                   0;
-%                   0;
-%                   0;
-%                   0;
-%                   0];
-%     end
+    if time > 0 && time <= 0.1*total_time
+        output = [0;
+                  0;
+                  0;
+                  1;
+                  0;
+                  0];
+    elseif time > 0.1*total_time && time <= 0.5*total_time
+        [psi_dot, x_dot] = driveArcActuation(0.5, pi/4, 4);
+        output = [0;
+                  0;
+                  psi_dot;
+                  x_dot;
+                  0;
+                  0];
+    elseif time > 0.5*total_time && time <= 0.7*total_time
+        output = [0;
+                  0;
+                  0;
+                  1;
+                  0;
+                  0];
+    elseif time > 0.7*total_time && time <= 0.8*total_time
+        [psi_dot, x_dot] = driveArcActuation(0.5, pi/4, 1);
+        output = [0;
+                  0;
+                  psi_dot;
+                  x_dot;
+                  0;
+                  0];
+    elseif time > 0.8*total_time && time < total_time*0.9
+        output = [0;
+                  0;
+                  0;
+                  3;
+                  0;
+                  0];
+    else
+        output = [0;
+                  0;
+                  0;
+                  0;
+                  0;
+                  0];
+    end
 
 %     if time > 0 && time <= 0.1*total_time
 %         output = [0;
@@ -110,12 +110,12 @@ elseif strcmp('act', direction)
 %     else
 %         output = zeros(6, 1);
 %     end
-    output=[0;
-            0;
-            2*pi;
-            0;
-            0;
-            0];
+%     output=[0;
+%             0;
+%             2*pi;
+%             0;
+%             0;
+%             0];
 end
 end
 

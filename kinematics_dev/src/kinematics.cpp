@@ -26,9 +26,9 @@ void Kinematics::updateTransforms(){
     Eigen::Matrix4d transJoint_Contact;
     Eigen::Vector4d curJointValues;
 
-    curWorldOri = q_(Eigen::seq(0, 2));
-    curWorldPos = q_(Eigen::seq(3, 5));
-    curJointValues = q_(Eigen::seq(6, 9));
+    curWorldOri = q_.block(0, 0, 3, 1);
+    curWorldPos = q_.block(3, 0, 3, 1);
+    curJointValues = q_.block(6, 0, 4, 1);
 
     transWorld_Base = homogenousTransform(curWorldOri, curWorldPos);
     transformList[0] = transWorld_Base;
@@ -85,11 +85,11 @@ void Kinematics::jacobian(){
         dispJoint_Contact = dWorld_Contact - dWorld_Joint;
 
         // put a x d in the appropriate column
-        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), i+5) = jointAxisWorld.cross(dispJoint_Contact);
+        jacobianMatrix_.block(3*(i-1), i+5, 3, 1) = jointAxisWorld.cross(dispJoint_Contact);
         // place body information
-        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 2)) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
-        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(3, 5)) = rotWorld_Base;
-        jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all) = rotWorld_Contact.transpose() * jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all);
+        jacobianMatrix_.block(3*(i-1), 0, 3, 3) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
+        jacobianMatrix_.block(3*(i-1), 3, 3, 3) = rotWorld_Base;
+        jacobianMatrix_.block(3*(i-1), 0, 3, 10) = rotWorld_Contact.transpose() * jacobianMatrix_.block(3*(i-1), 0, 3, 10);
     }
 
 }
@@ -99,13 +99,13 @@ void Kinematics::jacobian(){
 void Kinematics::motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float deltaT, KinematicDirection direction){
     
     q_dot_ = q_dot;
-    Eigen::Matrix<double, 6, 1> bodyVelocity = q_dot(Eigen::seq(0, 5));
-    Eigen::Vector4d jointRates = q_dot(Eigen::seq(6, 9));
+    Eigen::Matrix<double, 6, 1> bodyVelocity = q_dot.block(0, 0, 6, 1);
+    Eigen::Vector4d jointRates = q_dot.block(6, 0, 4, 1);
     updateTransforms();
     jacobian();
 
-    Eigen::Matrix<double, 12, 6> jacobianBody = jacobianMatrix_(Eigen::all, Eigen::seq(0, 5));
-    Eigen::Matrix<double, 12, 4> jacobianWheels = jacobianMatrix_(Eigen::all, Eigen::seq(6, 9));
+    Eigen::Matrix<double, 12, 6> jacobianBody = jacobianMatrix_.block(0, 0, 12, 6);
+    Eigen::Matrix<double, 12, 4> jacobianWheels = jacobianMatrix_.block(0, 6, 12, 4);
 
 
     if (direction == NAVIGATION){
@@ -118,8 +118,8 @@ void Kinematics::motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float del
         throw "Direction must be either 'NAVIGATION' or 'ACTUATION'.";
     }
 
-    q_dot_(Eigen::seq(0, 5)) = bodyVelocity;
-    q_dot_(Eigen::seq(6, 9)) = jointRates;
+    q_dot_.block(0, 0, 6, 1) = bodyVelocity;
+    q_dot_.block(6, 0, 4, 1) = jointRates;
 
     // perform Euler method step
     q_ += (spatialToCartesian()*q_dot_)*deltaT;
