@@ -1,4 +1,4 @@
 build/
 kinematics_dev/build/
 kinematics_dev/CMakeFiles/
-*.vscode
+.vscode
