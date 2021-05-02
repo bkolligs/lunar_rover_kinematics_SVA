@@ -85,15 +85,10 @@ void Kinematics::jacobian(){
         dispJoint_Contact = dWorld_Contact - dWorld_Joint;
 
         // put a x d in the appropriate column
-        // jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), i+5) = jointAxisWorld.cross(dispJoint_Contact);
         jacobianMatrix_.block(3*(i-1), i+5, 3, 1) = jointAxisWorld.cross(dispJoint_Contact);
-        // std::cout << jacobianMatrix_.block(3*(i-1), i+5, 3, 1) << std::endl;
         // place body information
-        // jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(0, 2)) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
         jacobianMatrix_.block(3*(i-1), 0, 3, 3) = skew(dWorld_Contact - dWorld_Base).transpose()*rotWorld_Base;
-        // jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::seq(3, 5)) = rotWorld_Base;
         jacobianMatrix_.block(3*(i-1), 3, 3, 3) = rotWorld_Base;
-        // jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all) = rotWorld_Contact.transpose() * jacobianMatrix_(Eigen::seq(3*(i-1), i*3 - 1), Eigen::all);
         jacobianMatrix_.block(3*(i-1), 0, 3, 10) = rotWorld_Contact.transpose() * jacobianMatrix_.block(3*(i-1), 0, 3, 10);
     }
 
@@ -109,9 +104,7 @@ void Kinematics::motionPrediction(Eigen::Matrix<double, 10, 1> &q_dot, float del
     updateTransforms();
     jacobian();
 
-    // Eigen::Matrix<double, 12, 6> jacobianBody = jacobianMatrix_(Eigen::all, Eigen::seq(0, 5));
     Eigen::Matrix<double, 12, 6> jacobianBody = jacobianMatrix_.block(0, 0, 12, 6);
-    // Eigen::Matrix<double, 12, 4> jacobianWheels = jacobianMatrix_(Eigen::all, Eigen::seq(6, 9));
     Eigen::Matrix<double, 12, 4> jacobianWheels = jacobianMatrix_.block(0, 6, 12, 4);
 
 
