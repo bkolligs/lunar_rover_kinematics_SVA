@@ -1,5 +1,5 @@
-classdef kinematicMR < handle
-    %kinematicMR the kinematics of MR model
+classdef symbolicMR < handle
+    %symbolicMR the kinematics of MR model but in symbolic math form
     %   This class shall hold the information required to construct a
     %   kinematic model of MR using the method of Kelly and Seegmiller.
     
@@ -20,19 +20,17 @@ classdef kinematicMR < handle
         table_ = [];
                 
         % current vehicle state
-        q_ = zeros(10, 1);
-        q_STATIC_ = zeros(10, 1);
-        q_dot_ = zeros(10, 1);
-        q_dot_STATIC_ = zeros(10, 1);
+        q_ = sym(zeros(10, 1));
+        q_dot_ = sym(zeros(10, 1));
         % contact frame slip constraints
-        vc_ = zeros(12, 1);
+        vc_ = sym(zeros(12, 1));
         % current world transform list
         tList_;
     end
     
     methods
-        function obj = kinematicMR(w, l, h, r, initial_state)
-            %kinematicMR Construct an instance of this class
+        function obj = symbolicMR(w, l, h, r, initial_state)
+            %symbolicMR Construct an instance of this class
             %   assign the w, l, h, and also intialize nodes to construct
             %   the tree.
             %
@@ -185,7 +183,7 @@ classdef kinematicMR < handle
                 % i is wheel joint frame not wheel contact frame
                 wheelT = tList(:, :, i);
                 contactT = tList(:, :, i+4);
-                aWheel = zeros(3, 10);
+                aWheel = sym(zeros(3, 10));
 
                 % revolute joints insert this familiar cross product
                 % rotation matrix world to wheel
@@ -207,8 +205,9 @@ classdef kinematicMR < handle
                 aWheel = R_w2c' * aWheel;
                 % insert wheel into stack
                 J = [J; aWheel];
+                
             end
-
+            disp(simplify(J))
         end
         
         function q = navigationLoop(obj, q_dot, dt)
@@ -251,24 +250,6 @@ classdef kinematicMR < handle
             obj.q_ = obj.q_ + (V*obj.q_dot_) * dt;
             q = obj.q_;
         end
-        function q = actuationLoopSTATIC(obj, q_dot, dt)
-            %actuationLoop goes through an 'inverse' pass of the robot,
-            % calculating wheel velocities to achieve desired body frame
-            % velocity
-            %   args:
-            %       q_dot - desired body velocities within full state
-            %       dt - time step
-            
-            obj.q_dot_STATIC_ = q_dot;
-            obj.tList_ = obj.constructTreeFromTable;
-            % solve for unknowns
-            obj.motionPredictionSTATIC('act');
-            
-            % integration
-            V = obj.cartesian2SpatialVelocity;
-            obj.q_STATIC_ = obj.q_STATIC_ + (V*obj.q_dot_STATIC_) * dt;
-            q = obj.q_STATIC_;
-        end
         
         function output_q = motionPrediction(obj, direction)
             %{
@@ -303,8 +284,8 @@ classdef kinematicMR < handle
             
             elseif strcmp('act', direction)
                 joint_rate = pinv(J_r)*(obj.vc_ - J_v*body_velocity);
-                disp(obj.vc_ - J_v*body_velocity)
-                disp(joint_rate)
+%                 disp(obj.vc_ - J_v*body_velocity)
+%                 disp(joint_rate)
             
             else
                 disp("[direction]: Choose between navigation ('nav') and acutation kinematics ('act')")
@@ -314,53 +295,6 @@ classdef kinematicMR < handle
             obj.q_dot_(1:6) = body_velocity;
             obj.q_dot_(7:10) = joint_rate;
             output_q = obj.q_dot_;
-        
-              
-        end
-        
-        
-        function output_q = motionPredictionSTATIC(obj, direction)
-            %{
-            motionPredictionSTATIC performs the calculation to predict motion
-            which is based off of kinematic constraints but uses the hard
-            coded jacobian calculation to do it
-            
-            args:
-                direction - navigation/actuation kinematics
-                            a) navigation kinematics goes from 
-                               actuated joint rates to body velocity
-                            b) actuation kinematics goes from desired body
-                               velocity to actuated joint rates
-            returns:
-                output_q - the full state with the unknown variables solved
-                for
-                
-            %}
-            % slice up the state vector
-            body_velocity = obj.q_dot_STATIC_(1:6);
-            joint_rate = obj.q_dot_STATIC_(7:10);
-
-            % calculate wheel jacobian
-            [J, J_v, J_r, J_v_inv, J_r_inv] = jacobians(obj.w_, obj.l_, obj.h_, obj.r_);
-
-            if strcmp('nav', direction)
-                % slice up the jacobian and state to calculate body
-                % velocity from joint rates
-                body_velocity = (J_v_inv)*(obj.vc_ - J_r*joint_rate);
-            
-            elseif strcmp('act', direction)
-                joint_rate = (J_r_inv)*(obj.vc_ - J_v*body_velocity);
-                disp(obj.vc_ - J_v*body_velocity)
-                disp(joint_rate)
-            
-            else
-                disp("[direction]: Choose between navigation ('nav') and acutation kinematics ('act')")
-                
-            end
-            
-            obj.q_dot_STATIC_(1:6) = body_velocity;
-            obj.q_dot_STATIC_(7:10) = joint_rate;
-            output_q = obj.q_dot_STATIC_;
         
               
         end
