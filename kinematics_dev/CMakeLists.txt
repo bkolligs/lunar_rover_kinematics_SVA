@@ -1,3 +1,4 @@
+project(KINEMATICS)
 cmake_minimum_required(VERSION 3.0)
 # set ALL the optimization flags :)
 SET(GCC_COVERAGE_COMPILE_FLAGS "-Ofast")
@@ -30,3 +31,5 @@ target_link_libraries(rover_kinematics ${GTEST_LIBRARIES} pthread kinematics)
 # Link runTests with what we want to test and the GTest and pthread library
 add_executable(runTests test/kinematics_tests.cpp)
 target_link_libraries(runTests ${GTEST_LIBRARIES} pthread kinematics)
+
+add_test(testOne runTests)

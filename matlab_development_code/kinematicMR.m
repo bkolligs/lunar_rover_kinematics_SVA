@@ -300,6 +300,7 @@ classdef kinematicMR < handle
                 % slice up the jacobian and state to calculate body
                 % velocity from joint rates
                 body_velocity = pinv(J_v)*(obj.vc_ - J_r*joint_rate);
+                disp(body_velocity)
             
             elseif strcmp('act', direction)
                 joint_rate = pinv(J_r)*(obj.vc_ - J_v*body_velocity);
