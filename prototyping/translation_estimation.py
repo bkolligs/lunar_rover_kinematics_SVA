@@ -7,23 +7,38 @@ import matplotlib.pyplot as plt
 
 class Rover:
 	def __init__(self, initial_state: np.ndarray, timestep: float):
-		self.state = initial_state
+		self.state = np.array(initial_state, dtype=float)
 		self.delta_t = timestep
 		self.length = 0.5
 		self.width = 1
 
-	def dynamics(self, linear, angular):
+	def dynamics(self, state, linear, angular):
 		x_dot = np.array(
 			[ 
-				linear*np.cos(self.state[2]),
-				linear*np.sin(self.state[2]),
+				linear*np.cos(state[2]),
+				linear*np.sin(state[2]),
 				angular
 			]
 		)
 		return x_dot
 	
-	def step(self, linear, angular):
-		self.state += self.dynamics(linear, angular) * self.delta_t
+	def step(self, linear, angular, method="rk4"):
+		if method == "rk4":
+			self.runge_kutta_integration(linear, angular)
+			return 
+
+		# euler integration
+		self.state += self.dynamics(self.state, linear, angular) * self.delta_t
+	
+	def runge_kutta_integration(self, linear, angular):
+		'''
+		Runge kutta fourth order integration for accuracy
+		'''
+		k1 = self.dynamics(self.state, linear, angular)
+		k2 = self.dynamics(self.state + 0.5*self.delta_t*k1, linear, angular)
+		k3 = self.dynamics(self.state + 0.5*self.delta_t*k2, linear, angular)
+		k4 = self.dynamics(self.state + self.delta_t*k3, linear, angular)
+		self.state += (self.delta_t/6.0) *(k1 + 2*k2 + 2*k3 + k4)
 	
 	def plot_simulation(self, t=None):
 		plt.clf()
