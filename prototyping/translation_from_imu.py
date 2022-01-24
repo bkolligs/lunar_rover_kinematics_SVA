@@ -4,7 +4,6 @@ This file tests out the method Haidar uses to estimate postiion and verify it wo
 The approach uses the rover's orientation estimate as a quaternion and transforms the linear velocity of the rover into this rotated frame. 
 Then adds the transformed position to the previous position
 '''
-from turtle import update
 import numpy as np
 import matplotlib.pyplot as plt
 from pyquaternion import Quaternion
